@@ -9,6 +9,22 @@ use std::collections::HashMap;
 use std::path::Path;
 use tokio::io::AsyncReadExt;
 
+/// Validates a commit OID or `HEAD` reference so arguments cannot inject Git CLI flags.
+pub fn validate_commit_oid(raw: &str) -> Result<String, CoreError> {
+    let trimmed = raw.trim();
+    if trimmed == "HEAD" {
+        return Ok("HEAD".to_string());
+    }
+    let valid_hex =
+        (4..=64).contains(&trimmed.len()) && trimmed.bytes().all(|b| b.is_ascii_hexdigit());
+    if !valid_hex {
+        return Err(CoreError::InvalidArgument(
+            "Invalid commit identifier: expected 4-64 hexadecimal characters or HEAD".to_string(),
+        ));
+    }
+    Ok(trimmed.to_ascii_lowercase())
+}
+
 /// Queries diff for a specific file.
 pub async fn query_file_diff(
     executor: &GitExecutor,
@@ -19,15 +35,16 @@ pub async fn query_file_diff(
 ) -> Result<FileDiffResponse, CoreError> {
     let clean_path = validate_repo_relative_path(relative_path)?;
     let disk_file = resolve_safe_target_path(repo_root, relative_path)?;
+    let validated_commit = commit.map(validate_commit_oid).transpose()?;
     let mut cmd = executor.create_command(repo_root);
 
-    if let Some(commit_oid) = commit {
+    if let Some(ref commit_oid) = validated_commit {
         cmd.args([
             "show",
             "--no-ext-diff",
             "--no-textconv",
             "--format=",
-            commit_oid,
+            commit_oid.as_str(),
             "--",
         ]);
     } else if staged {
@@ -152,6 +169,7 @@ pub async fn query_commit_files(
     repo_root: &Path,
     commit_oid: &str,
 ) -> Result<Vec<GitFileChange>, CoreError> {
+    let safe_oid = validate_commit_oid(commit_oid)?;
     let mut status_cmd = executor.create_command(repo_root);
     status_cmd.args([
         "show",
@@ -159,7 +177,7 @@ pub async fn query_commit_files(
         "--first-parent",
         "--name-status",
         "--format=",
-        commit_oid,
+        safe_oid.as_str(),
         "--",
     ]);
     let status_out = executor
@@ -181,7 +199,7 @@ pub async fn query_commit_files(
         "--first-parent",
         "--numstat",
         "--format=",
-        commit_oid,
+        safe_oid.as_str(),
         "--",
     ]);
     let numstat_out = executor

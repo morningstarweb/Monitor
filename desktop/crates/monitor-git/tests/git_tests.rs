@@ -338,3 +338,61 @@ async fn generic_discard_confirmation_never_deletes_a_file() {
     );
     assert!(file.exists());
 }
+
+#[tokio::test]
+async fn query_commit_and_diff_reject_flag_injection_commit_ids() {
+    use monitor_git::{commit, query_commit_files, stage_all};
+    let repo = setup_test_git_repo();
+    let executor = GitExecutor::new().expect("executor");
+    fs::write(repo.path().join("tracked.txt"), "hello\n").expect("write");
+    stage_all(&executor, repo.path()).await.expect("stage");
+    commit(&executor, repo.path(), "init", None, false)
+        .await
+        .expect("commit");
+
+    let head_out = Command::new("git")
+        .args(["rev-parse", "HEAD"])
+        .current_dir(repo.path())
+        .output()
+        .expect("rev-parse");
+    let head_sha = String::from_utf8_lossy(&head_out.stdout).trim().to_string();
+
+    let files = query_commit_files(&executor, repo.path(), &head_sha)
+        .await
+        .expect("valid full SHA should succeed");
+    assert_eq!(files.len(), 1);
+    assert_eq!(files[0].path, "tracked.txt");
+
+    let short_files = query_commit_files(&executor, repo.path(), &head_sha[..7])
+        .await
+        .expect("valid short SHA should succeed");
+    assert_eq!(short_files.len(), 1);
+
+    let head_diff = query_file_diff(&executor, repo.path(), "tracked.txt", false, Some("HEAD"))
+        .await
+        .expect("HEAD should succeed");
+    assert_eq!(head_diff.path, "tracked.txt");
+
+    for bad_oid in [
+        "",
+        "--output=evil.txt",
+        "-n",
+        "main..HEAD",
+        "HEAD;whoami",
+        "123",
+        "abcd\0ef01",
+    ] {
+        assert!(
+            query_commit_files(&executor, repo.path(), bad_oid)
+                .await
+                .is_err(),
+            "query_commit_files must reject {bad_oid:?}"
+        );
+        assert!(
+            query_file_diff(&executor, repo.path(), "tracked.txt", false, Some(bad_oid))
+                .await
+                .is_err(),
+            "query_file_diff must reject {bad_oid:?}"
+        );
+    }
+}

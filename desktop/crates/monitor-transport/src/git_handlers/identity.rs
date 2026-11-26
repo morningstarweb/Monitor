@@ -94,23 +94,35 @@ pub async fn set_git_identity(
     let trimmed_name = payload.name.trim();
     let trimmed_email = payload.email.trim();
 
-    if trimmed_name.is_empty() {
+    if trimmed_name.is_empty()
+        || trimmed_name.len() > 256
+        || trimmed_name.starts_with('-')
+        || trimmed_name.chars().any(char::is_control)
+    {
         return Err((
             StatusCode::BAD_REQUEST,
             Json(ApiErrorResponse::new(
                 ErrorCode::InvalidArgument,
-                "Name cannot be empty".to_string(),
+                "Name must be non-empty, <= 256 chars, without leading '-' or control characters"
+                    .to_string(),
                 false,
             )),
         ));
     }
 
-    if trimmed_email.is_empty() || !trimmed_email.contains('@') {
+    if trimmed_email.is_empty()
+        || trimmed_email.len() > 256
+        || trimmed_email.starts_with('-')
+        || !trimmed_email.contains('@')
+        || trimmed_email
+            .chars()
+            .any(|c| c.is_control() || c.is_whitespace())
+    {
         return Err((
             StatusCode::BAD_REQUEST,
             Json(ApiErrorResponse::new(
                 ErrorCode::InvalidArgument,
-                "A valid email address is required".to_string(),
+                "A valid email address without leading '-' or whitespace is required".to_string(),
                 false,
             )),
         ));
@@ -119,7 +131,7 @@ pub async fn set_git_identity(
     let _ = state
         .git_executor
         .create_command(std::path::Path::new("."))
-        .args(["config", "--global", "user.name", trimmed_name])
+        .args(["config", "--global", "--", "user.name", trimmed_name])
         .output()
         .await
         .map_err(|e| {
@@ -136,7 +148,7 @@ pub async fn set_git_identity(
     let _ = state
         .git_executor
         .create_command(std::path::Path::new("."))
-        .args(["config", "--global", "user.email", trimmed_email])
+        .args(["config", "--global", "--", "user.email", trimmed_email])
         .output()
         .await
         .map_err(|e| {

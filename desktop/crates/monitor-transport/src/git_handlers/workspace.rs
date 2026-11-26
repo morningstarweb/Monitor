@@ -197,15 +197,23 @@ pub async fn get_commit_files(
         &commit_oid,
     )
     .await
-    .map_err(|e| {
-        (
+    .map_err(|e| match e {
+        monitor_core::CoreError::InvalidArgument(msg) => (
+            StatusCode::BAD_REQUEST,
+            Json(ApiErrorResponse::new(
+                ErrorCode::InvalidArgument,
+                msg,
+                false,
+            )),
+        ),
+        _ => (
             StatusCode::INTERNAL_SERVER_ERROR,
             Json(ApiErrorResponse::new(
                 ErrorCode::InternalError,
                 format!("Failed to query commit files: {e}"),
                 false,
             )),
-        )
+        ),
     })?;
 
     Ok(Json(files))

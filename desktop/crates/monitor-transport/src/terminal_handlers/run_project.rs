@@ -92,7 +92,12 @@ fn build_project_command(
 
     #[cfg(not(windows))]
     let mut cmd = {
-        let mut c = tokio::process::Command::new(shell.unwrap_or("sh"));
+        let shell_bin = match shell {
+            Some("bash") => "bash",
+            Some("zsh") => "zsh",
+            _ => "sh",
+        };
+        let mut c = tokio::process::Command::new(shell_bin);
         c.args(["-c", command_str]);
         c
     };

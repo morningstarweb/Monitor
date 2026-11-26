@@ -52,6 +52,21 @@ fn canonical_or_lower(path: &Path) -> String {
         .to_lowercase()
 }
 
+fn find_registered_repo_path(state: &AppState, requested_path: &str) -> Option<std::path::PathBuf> {
+    let repos = state.storage.list_repositories().ok()?;
+    let trimmed = requested_path.trim();
+    if trimmed.is_empty() {
+        return repos
+            .first()
+            .map(|repo| std::path::PathBuf::from(&repo.canonical_path));
+    }
+    let target = canonical_or_lower(Path::new(trimmed));
+    repos
+        .into_iter()
+        .find(|repo| canonical_or_lower(Path::new(&repo.canonical_path)) == target)
+        .map(|repo| std::path::PathBuf::from(repo.canonical_path))
+}
+
 fn is_registered_repo(state: &AppState, path: &Path) -> bool {
     let Ok(repos) = state.storage.list_repositories() else {
         return false;
@@ -103,27 +118,20 @@ pub async fn create_checkpoint_handler(
         &payload.repo_path,
     )?;
 
-    let mut target_repo = payload.repo_path.trim().to_string();
-    if target_repo.is_empty()
-        && let Ok(repos) = state.storage.list_repositories()
-        && let Some(first) = repos.first()
-    {
-        target_repo = first.canonical_path.clone();
-    }
-
-    let path = Path::new(&target_repo);
-    if !path.join(".git").exists() {
-        return Err(StatusCode::BAD_REQUEST);
-    }
-    if !is_registered_repo(&state, path) {
+    let Some(trusted_path) = find_registered_repo_path(&state, &payload.repo_path) else {
         let _ = state.storage.insert_audit_entry(
             device.device_id.as_str(),
             "create_checkpoint",
-            &target_repo,
+            payload.repo_path.trim(),
             "denied_unregistered_repo",
         );
         return Err(StatusCode::FORBIDDEN);
+    };
+
+    if !trusted_path.join(".git").exists() {
+        return Err(StatusCode::BAD_REQUEST);
     }
+    let path = trusted_path.as_path();
 
     let git_exec = GitExecutor::new().map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
 
