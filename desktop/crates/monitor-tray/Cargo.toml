@@ -1,0 +1,50 @@
+[package]
+name = "monitor-tray"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+
+[lints.rust]
+warnings = "deny"
+unused_must_use = "deny"
+missing_debug_implementations = "warn"
+unsafe_code = "allow"
+
+[lints.clippy]
+unwrap_used = "deny"
+expect_used = "deny"
+panic = "deny"
+todo = "deny"
+unimplemented = "deny"
+dbg_macro = "deny"
+print_stdout = "deny"
+print_stderr = "deny"
+clone_on_ref_ptr = "warn"
+explicit_iter_loop = "warn"
+manual_let_else = "warn"
+match_same_arms = "warn"
+redundant_closure_for_method_calls = "warn"
+
+[[bin]]
+name = "monitor"
+path = "src/main.rs"
+
+[dependencies]
+monitor-core.workspace = true
+monitor-agent = { path = "../monitor-agent" }
+tray-icon.workspace = true
+reqwest = { workspace = true, features = ["blocking"] }
+serde.workspace = true
+serde_json.workspace = true
+chrono.workspace = true
+tracing.workspace = true
+tracing-subscriber.workspace = true
+anyhow.workspace = true
+winreg = { workspace = true }
+sysinfo = { workspace = true }
+rfd = { workspace = true }
+raw-window-handle = "0.6"
+gpui-kit.workspace = true
+qrcode = { version = "0.14", default-features = false }
+

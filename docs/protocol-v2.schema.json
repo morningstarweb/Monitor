@@ -1,0 +1,91 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "MonitorProtocolV2Envelope",
+  "description": "Standard transport-neutral envelope for Monitor Protocol v2",
+  "type": "object",
+  "required": [
+    "protocol_version",
+    "session_id",
+    "message_id",
+    "epoch",
+    "stream",
+    "type",
+    "seq",
+    "ack",
+    "deadline_ms"
+  ],
+  "properties": {
+    "protocol_version": {
+      "type": "integer",
+      "const": 2
+    },
+    "session_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "message_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "epoch": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "stream": {
+      "type": "string",
+      "enum": ["control", "telemetry", "bulk"]
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "HELLO",
+        "HELLO_ACK",
+        "CAPABILITIES",
+        "PING",
+        "PONG",
+        "SESSION_CLOSE",
+        "ERROR",
+        "CREDIT",
+        "SNAPSHOT",
+        "DELTA",
+        "RESYNC_REQUEST",
+        "WATCHDOG_ALERT",
+        "PROJECTS_REQUEST",
+        "PROJECTS_RESULT",
+        "GIT_GRAPH_REQUEST",
+        "GIT_GRAPH_RESULT",
+        "GIT_DIFF_REQUEST",
+        "GIT_DIFF_CHUNK",
+        "GIT_DIFF_END",
+        "COMMAND_REQUEST",
+        "COMMAND_ACCEPTED",
+        "COMMAND_REJECTED",
+        "COMMAND_PROGRESS",
+        "COMMAND_RESULT",
+        "COMMAND_STATUS_REQUEST",
+        "COMMAND_STATUS_RESULT",
+        "PATH_PREPARE",
+        "PATH_COMMIT"
+      ]
+    },
+    "seq": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "ack": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "deadline_ms": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "command_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "payload": {
+      "type": ["object", "null"]
+    }
+  }
+}

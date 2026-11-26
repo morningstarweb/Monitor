@@ -1,0 +1,81 @@
+# Rust
+/target/
+/desktop/target/
+**/*.rs.bk
+*.res
+
+# Android / Gradle
+.gradle/
+.gradle_reviewer*/
+build/
+**/build/
+local.properties
+*.apk
+*.aab
+*.ap_
+*.dex
+*.class
+.cxx/
+/android/.gradle/
+/android/local.properties
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+env/
+venv/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+
+# OS / Editor
+.DS_Store
+Thumbs.db
+desktop.ini
+*.swp
+*.swo
+*~
+.idea/
+*.iml
+.vscode/
+
+# Monitor runtime / test output
+/logs/
+/tmp/
+*.log
+phone_*.png
+/graphify-out/
+tests/e2e/test_results.json
+*.exe
+# Pinned MinGit is fetched and verified when building the Windows installer.
+/installer/tools/
+/bin/*.exe
+/bin/*.apk
+Monitor_App_Package/
+android/.kotlin/
+*.salive
+*.txt
+!installer/*.txt
+!THIRD_PARTY_NOTICES.txt
+*.bat
+!release.bat
+!export_public.bat
+.export_target
+
+# Cloudflare & Node
+*.zip
+# WIN-01: the installer's compilation fixture is a required, hash-attested
+# build input. Production releases replace it via the release pipeline.
+!desktop/crates/monitor-installer/payload.zip
+node_modules/
+.wrangler/
+.mf/
+dist/
+cloud/cloudflare.accounts.json
+*client_secret*.json
+config/google_*.json
+
+
+

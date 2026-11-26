@@ -1,0 +1,4 @@
+# ShellCheck configuration
+disable=SC1090,SC1091
+shell=bash
+

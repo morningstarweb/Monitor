@@ -1,0 +1,14 @@
+# Taplo configuration for TOML formatting and schema validation
+[formatting]
+align_entries = false
+array_auto_collapse = true
+array_auto_expand = true
+compact_arrays = true
+compact_inline_tables = true
+indent_string = "    "
+reorder_keys = false
+trailing_newline = true
+
+[schema]
+enabled = true
+

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.Monitor" parent="@android:style/Theme.Material.NoActionBar">
+        <item name="android:windowBackground">#07080E</item>
+        <item name="android:statusBarColor">#07080E</item>
+        <item name="android:navigationBarColor">#07080E</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:windowLightNavigationBar">false</item>
+        <item name="android:enforceNavigationBarContrast">false</item>
+        <item name="android:enforceStatusBarContrast">false</item>
+
+        <!-- Android 12+ (API 31+) SplashScreen: Deep Obsidian Black (#07080E) -->
+        <item name="android:windowSplashScreenBackground">#07080E</item>
+        <item name="android:windowSplashScreenAnimatedIcon">@drawable/ic_monitor_foreground</item>
+        <item name="android:windowSplashScreenIconBackgroundColor">#07080E</item>
+    </style>
+</resources>

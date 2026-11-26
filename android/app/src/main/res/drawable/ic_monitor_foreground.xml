@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="1536"
+    android:viewportHeight="1536">
+
+    <!-- Scaled & Centered inside Android 108dp Adaptive Icon Safe Zone -->
+    <group
+        android:scaleX="0.72"
+        android:scaleY="0.72"
+        android:translateX="215"
+        android:translateY="400">
+
+        <!-- M + Top-Right Tilted Monitor Bezel -->
+        <path android:pathData="M 191 650 L 191 357 L 242 357 Q 257 357 265 369 L 316 447 L 378 349 Q 392 325 420 320 L 1162 196 Q 1239 183 1239 260 L 1239 454 A 118 118 0 0 0 1188 415 L 1188 286 Q 1188 244 1146 250 L 476 344 Q 438 350 438 386 L 438 613 L 383 613 L 383 451 L 316 555 L 247 450 L 247 614 Q 216 628 191 650 Z">
+            <aapt:attr name="android:fillColor">
+                <gradient
+                    android:startX="191"
+                    android:startY="200"
+                    android:endX="1239"
+                    android:endY="650"
+                    android:type="linear">
+                    <item android:offset="0.0" android:color="#FF5B4DFF"/>
+                    <item android:offset="0.55" android:color="#FF8B5CF6"/>
+                    <item android:offset="1.0" android:color="#FF00D2FF"/>
+                </gradient>
+            </aapt:attr>
+        </path>
+
+        <!-- Bottom Monitor Bezel + Stand Neck & Base -->
+        <path android:pathData="M 227 647 Q 247 635 268 627 L 268 666 Q 268 699 304 699 L 1152 699 Q 1188 699 1188 663 L 1188 630 A 118 118 0 0 0 1239 589 L 1239 684 Q 1239 742 1181 742 L 787 742 L 805 802 L 916 802 Q 945 802 945 831 L 945 835 L 505 835 L 505 831 Q 505 802 534 802 L 656 802 L 674 742 L 285 742 Q 227 742 227 684 Z">
+            <aapt:attr name="android:fillColor">
+                <gradient
+                    android:startX="227"
+                    android:startY="627"
+                    android:endX="1239"
+                    android:endY="835"
+                    android:type="linear">
+                    <item android:offset="0.0" android:color="#FF00D2FF"/>
+                    <item android:offset="1.0" android:color="#FF5B4DFF"/>
+                </gradient>
+            </aapt:attr>
+        </path>
+
+        <!-- First 'o' with EvenOdd Git Branch Knockout -->
+        <path
+            android:fillType="evenOdd"
+            android:fillColor="#FFF8FAFC"
+            android:pathData="M 548 423.5 A 101 101 0 1 0 548 625.5 A 101 101 0 1 0 548 423.5 Z M 522.75 484.35 A 19 19 0 1 1 545.22 479.01 L 578.00 509.05 A 19 19 0 1 1 567.53 520.47 L 538.25 493.58 L 538.25 546.65 A 19 19 0 1 1 522.75 546.65 Z"/>
+
+        <!-- Glowing Emerald Git Branch Overlay -->
+        <path
+            android:fillColor="#FF10B981"
+            android:pathData="M 522.75 484.35 A 19 19 0 1 1 545.22 479.01 L 578.00 509.05 A 19 19 0 1 1 567.53 520.47 L 538.25 493.58 L 538.25 546.65 A 19 19 0 1 1 522.75 546.65 Z"/>
+
+        <!-- Wordmark Letters n, i, t, o, r -->
+        <path android:fillColor="#FFF8FAFC" android:pathData="M 661 613 L 661 432 L 706 432 L 707 452 Q 730 426 768 426 Q 838 426 838 492 L 838 613 L 784 613 L 784 510 Q 784 478 748 478 Q 710 478 710 512 L 710 613 Z"/>
+        <path android:fillColor="#FF00D2FF" android:pathData="M 886.5 363.5 A 28 28 0 1 0 886.5 419.5 A 28 28 0 1 0 886.5 363.5 Z"/>
+        <path android:fillColor="#FFF8FAFC" android:pathData="M 859 432 L 909 432 L 909 613 L 859 613 Z"/>
+        <path android:fillColor="#FFF8FAFC" android:pathData="M 931 380 L 979 380 L 979 432 L 1029 432 L 1029 478 L 979 478 L 979 552 Q 979 572 1002 572 L 1030 572 L 1030 614 L 990 614 Q 931 614 931 562 Z"/>
+        <path
+            android:fillType="evenOdd"
+            android:fillColor="#FFF8FAFC"
+            android:pathData="M 1133.5 423.5 A 100.5 100.5 0 1 0 1133.5 624.5 A 100.5 100.5 0 1 0 1133.5 423.5 Z M 1132.5 475.8 A 48.2 48.2 0 1 1 1132.5 572.2 A 48.2 48.2 0 1 1 1132.5 475.8 Z"/>
+        <path android:fillColor="#FFF8FAFC" android:pathData="M 1249 614 L 1249 428 L 1301 428 L 1301 452 Q 1318 427 1348 427 Q 1358 427 1363 431 L 1363 479 Q 1353 476 1340 476 Q 1302 476 1302 512 L 1302 614 Z"/>
+    </group>
+</vector>
