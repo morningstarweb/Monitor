@@ -11,11 +11,11 @@ Monitor is a native Windows host service paired with an Android companion app fo
 </p>
 
 <p>
-  <a href="https://github.com/morningstarweb/Monitor/releases/download/v1.0.0/Monitor_Setup_v1.0.0.exe">
+  <a href="https://github.com/morningstarweb/Monitor/releases/download/v1.0.0/Monitor_Setup.exe">
     <img src="assets/branding/download-windows.svg" width="268" alt="Download Monitor for Windows" />
   </a>
   &nbsp;&nbsp;
-  <a href="https://github.com/morningstarweb/Monitor/releases/latest">
+  <a href="https://github.com/morningstarweb/Monitor/releases/download/v1.0.0/Monitor.apk">
     <img src="assets/branding/download-android.svg" width="268" alt="Download Monitor for Android" />
   </a>
 </p>
@@ -55,10 +55,9 @@ Every connection runs end-to-end encrypted between your own devices, works offli
 
 | Platform | Package | Link | Notes |
 | --- | --- | --- | --- |
-| Windows 10 / 11 (x64) | Installer EXE (`62.5 MiB`) | [Download `Monitor_Setup_v1.0.0.exe`](https://github.com/morningstarweb/Monitor/releases/download/v1.0.0/Monitor_Setup_v1.0.0.exe) | Recommended. Includes desktop host, uninstaller, MSVC runtimes, and portable MinGit `2.56.1`. |
-| Windows 10 / 11 (x64) | Standalone Binary (`36.1 MiB`) | [Download `monitor-v1.0.0.exe`](https://github.com/morningstarweb/Monitor/releases/download/v1.0.0/monitor-v1.0.0.exe) | Portable single binary. Requires Git already installed on `PATH`. |
-| Android 11+ (API 30-35) | Companion APK | [Open `v1.0.0` Release Page](https://github.com/morningstarweb/Monitor/releases/latest) | Signed `Monitor-Android-v1.0.0.apk` is pending release keystore upload. Debug APKs are never published here; build locally from [Build Guide](docs/BUILD.md). |
-| Release Verification | Checksums & SBOM | [`CHECKSUMS.sha256`](https://github.com/morningstarweb/Monitor/releases/download/v1.0.0/CHECKSUMS.sha256) / [`monitor-v1.0.0-sbom.json`](https://github.com/morningstarweb/Monitor/releases/download/v1.0.0/monitor-v1.0.0-sbom.json) | Verify file integrity locally before running downloaded executables. |
+| Windows 10 / 11 (x64) | Installer EXE (`62.5 MiB`) | [Download `Monitor_Setup.exe`](https://github.com/morningstarweb/Monitor/releases/download/v1.0.0/Monitor_Setup.exe) | Single full installer. Includes desktop tray host, background service, uninstaller, and portable MinGit. |
+| Android 11+ (API 30-35) | Companion APK (`46.2 MiB`) | [Download `Monitor.apk`](https://github.com/morningstarweb/Monitor/releases/download/v1.0.0/Monitor.apk) | Official release build signed with Morning Star Web key. Install directly on Android phone. |
+| Release Verification | Checksums | [`CHECKSUMS.sha256`](https://github.com/morningstarweb/Monitor/releases/download/v1.0.0/CHECKSUMS.sha256) | Verify file integrity locally before running downloaded packages. |
 
 > **Windows SmartScreen notice:** `v1.0.0` Windows binaries are unsigned under a zero-budget distribution model. Verify the SHA-256 digest against [`CHECKSUMS.sha256`](https://github.com/morningstarweb/Monitor/releases/download/v1.0.0/CHECKSUMS.sha256) first; if SmartScreen prompts, review the verified hash before choosing **More info** and **Run anyway**.
 
@@ -107,9 +106,9 @@ Monitor ships with a hardware-accelerated **GPUI Native Glass** Windows installe
 
 **User journey:** Download -> Install -> Connect -> Use
 
-1. **Install on Windows:** Download `Monitor_Setup_v1.0.0.exe`, check its SHA-256 digest (`c6fd8af0b0cd9e962a3774c26a0697981b27e6e25ad6561887a4e76fb11627a0`), and run the per-user installer. No administrator privileges are required.
+1. **Install on Windows:** Download `Monitor_Setup.exe`, check its SHA-256 digest (`c6fd8af0b0cd9e962a3774c26a0697981b27e6e25ad6561887a4e76fb11627a0`), and run the installer. No administrator privileges are required.
    ```powershell
-   Get-FileHash .\Monitor_Setup_v1.0.0.exe -Algorithm SHA256
+   Get-FileHash .\Monitor_Setup.exe -Algorithm SHA256
    ```
 2. **Launch the tray companion:** Start **Monitor** from the Start Menu or Desktop shortcut. Clicking the tray icon opens the desktop control flyout (`Projects`, `Mobile & Devices`, `Permissions`, `System Monitor`, `Cloud`, and `Settings`).
 3. **Pair your phone (`T3 Admin`):** Sign in with the same Google account on Windows and Android, or tap **Use Local Wi-Fi / Tailscale / Manual QR** on Android to stay offline. Scan the desktop QR code or enter the 6-digit verification code from **Mobile & Devices** to unlock control actions.

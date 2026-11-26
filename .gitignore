@@ -79,3 +79,11 @@ config/google_*.json
 
 
 
+
+# Android Keystores and Production Signing Assets
+*.jks
+*.keystore
+android/keystore/morningstar-release.jks
+android/keystore/
+*.idsig
+
