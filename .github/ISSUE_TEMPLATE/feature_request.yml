@@ -1,0 +1,43 @@
+name: Feature Request
+description: Propose an idea, new capability, or enhancement for Monitor.
+title: "[Feature]: "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        We appreciate community ideas to make Monitor even better!
+  - type: dropdown
+    id: component
+    attributes:
+      label: Target Component
+      description: Which component would this enhancement affect?
+      options:
+        - Windows Desktop App
+        - Android Companion App
+        - Cloudflare Edge Broker
+        - Git Workspace / Remote Management
+        - Telemetry & Analytics
+        - Documentation / Developer Experience
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem or Motivation
+      description: Is your feature request related to a problem or limitation?
+      placeholder: "I'm always frustrated when [...]"
+    validations:
+      required: true
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed Solution
+      description: Describe the solution or new behavior you would like to see.
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternative Solutions
+      description: Describe any alternative solutions or workarounds you've considered.

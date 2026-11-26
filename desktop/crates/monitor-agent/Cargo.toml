@@ -1,0 +1,31 @@
+[package]
+name = "monitor-agent"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+
+[lints]
+workspace = true
+
+[lib]
+name = "monitor_agent"
+path = "src/lib.rs"
+
+[dependencies]
+monitor-core.workspace = true
+monitor-storage.workspace = true
+monitor-telemetry.workspace = true
+monitor-git.workspace = true
+monitor-transport.workspace = true
+tokio.workspace = true
+tracing.workspace = true
+anyhow.workspace = true
+sysinfo.workspace = true
+serde_json.workspace = true
+chrono.workspace = true
+reqwest.workspace = true
+
+[target.'cfg(windows)'.dependencies]
+windows-sys = { workspace = true }
+

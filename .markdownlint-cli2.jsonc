@@ -1,0 +1,15 @@
+{
+  "config": {
+    "default": true,
+    "MD013": false, // Line length handled pragmatically for technical docs
+    "MD024": { "siblings_only": true },
+    "MD033": false, // Inline HTML allowed for badges/alerts
+    "MD041": false
+  },
+  "ignores": [
+    "target/**",
+    "**/build/**",
+    ".git/**"
+  ]
+}
+

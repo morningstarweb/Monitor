@@ -1,0 +1,44 @@
+[extend]
+useDefault = true
+
+[[allowlists]]
+description = "Git metadata is not a scanning target"
+paths = [
+    '''\.git/.*''',
+]
+
+[[allowlists]]
+description = "Owner-local OAuth configuration, never tracked (gitignored)"
+paths = [
+    '''config/google_.*\.json$''',
+]
+
+[[allowlists]]
+description = "Generated build output and analysis cache are not source"
+paths = [
+    '''.*/target/.*''',
+    '''.*/build/.*''',
+    '''.*/\.gradle/.*''',
+    '''graphify-out/.*''',
+    '''.*/node_modules/.*''',
+]
+
+[[allowlists]]
+description = "Reviewed synthetic token fixtures in tests (high-entropy strings, no live credentials)"
+paths = [
+    '''desktop/crates/monitor-transport/tests/adversarial_challenge_tests/pull_request_merge\.rs$''',
+    '''desktop/crates/monitor-transport/tests/adversarial_challenge_tests/process_kill\.rs$''',
+    '''desktop/crates/monitor-transport/tests/api_tests/process_control\.rs$''',
+    '''desktop/crates/monitor-transport/tests/watchdog_api_tests/.*\.rs$''',
+    '''tests/e2e/tier1_feature/test_feat06_account_broker_panels\.py$''',
+    '''tests/test_tier5_integration_scenarios\.py$''',
+]
+
+[[allowlists]]
+description = "Synthetic OAuth placeholder used only by a unit test (NEW-15): scoped to that exact file"
+paths = [
+    '''desktop/crates/monitor-transport/src/cloud\.rs$''',
+]
+regexes = [
+    '''GOCSPX-configured_in_env''',
+]

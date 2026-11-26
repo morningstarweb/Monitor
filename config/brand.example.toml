@@ -1,0 +1,41 @@
+# Example brand configuration: COPY AND EDIT, DO NOT USE AS-IS.
+# Copy to config/brand.toml, replace every placeholder, then run:
+#   python scripts/sync_brand.py
+# This template contains no credentials and no official identifiers.
+# Values below are examples only and are not the project's release values.
+
+[brand]
+name = "Example Monitor"
+slug = "example-monitor"
+tagline = "REPLACE_WITH_OWNER_TAGLINE"
+version = "0.0.0-example"
+copyright = "REPLACE_WITH_OWNER_ORGANIZATION"
+
+[network]
+default_port = 9480
+tailscale_cgnat_cidr = "100.64.0.0/10"
+loopback_host = "127.0.0.1"
+
+[android]
+# Use an application ID you control; never reuse an official/published ID in a fork.
+application_id = "com.example.monitor"
+namespace = "com.example.monitor"
+min_sdk = 30
+target_sdk = 35
+compile_sdk = 35
+version_code = 1
+version_name = "0.0.0-example"
+
+[colors.dark]
+# Example palette only; replace with your own brand tokens.
+primary = "#000000"
+primary_secondary = "#000000"
+accent = "#000000"
+success = "#000000"
+warning = "#000000"
+error = "#000000"
+surface = "#000000"
+card = "#000000"
+border = "#000000"
+text = "#000000"
+muted_text = "#000000"

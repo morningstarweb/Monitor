@@ -1,0 +1,18 @@
+{
+  "name": "monitor",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Monitor Multi-Device Remote Control & Watchdog",
+  "type": "module",
+  "scripts": {
+    "dev": "node scripts/dev.mjs",
+    "dev:ps": "powershell -ExecutionPolicy Bypass -File scripts/dev.ps1",
+    "dev:no-open": "node scripts/dev.mjs --no-open",
+    "dev:check": "node scripts/dev.mjs --check-only",
+    "dev:desktop": "cargo run --manifest-path desktop/Cargo.toml -p monitor-tray",
+    "dev:cloud": "npm --prefix cloud run dev",
+    "test:desktop": "cargo test --manifest-path desktop/Cargo.toml -p monitor-transport",
+    "test:android": "cd android && gradlew.bat :core:network:testReleaseUnitTest",
+    "test:all": "cargo test --manifest-path desktop/Cargo.toml -p monitor-transport && cd android && gradlew.bat :core:network:testReleaseUnitTest"
+  }
+}

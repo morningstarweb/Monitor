@@ -1,0 +1,65 @@
+THIRD-PARTY SOFTWARE NOTICES AND INFORMATION
+================================================================================
+Product: Monitor (Windows Desktop Host & Android Companion)
+Organization: Morning Star Web (Kolkata, West Bengal, India)
+License (Monitor First-Party Source Code): PolyForm Noncommercial License 1.0.0 (see LICENSE)
+
+This file summarizes third-party components and open-source software bundled
+with or linked by Monitor binary distributions. Monitor's own first-party
+source code in this repository is licensed under PolyForm Noncommercial 1.0.0.
+
+================================================================================
+1. GNU GENERAL PUBLIC LICENSE v2.0 (GPL-2.0) BUNDLED RUNTIME
+================================================================================
+
+* Git for Windows / MinGit (version 2.56.1.windows.1)
+  Installed location (when bundled in Windows releases): <app>\tools\git\
+  Upstream Project: https://gitforwindows.org / https://github.com/git-for-windows/git
+  License: GNU General Public License, version 2 (GPL-2.0) and bundled tools
+
+  Written Offer for Source Code (GPL-2.0 Section 3(b)):
+  If you received a Monitor Windows installer or binary package that bundles
+  MinGit without its corresponding source archive, Morning Star Web will provide
+  upon request, for a period of three (3) years from distribution and at no
+  more than the physical media/distribution cost, a complete machine-readable
+  copy of the corresponding source code for MinGit 2.56.1.windows.1.
+  Corresponding upstream source tags and build recipes are also archived at:
+    https://github.com/git-for-windows/git/releases/tag/v2.56.1.windows.1
+  To request source media directly, contact: contact@morningstarweb.space
+
+================================================================================
+2. PROPRIETARY / PLATFORM REDISTRIBUTABLES
+================================================================================
+
+* Microsoft Visual C++ Redistributable Runtime DLLs (when staged in installer/redist)
+  Licensed under Microsoft Software License Terms for Visual Studio Runtime
+  redistributables. Redistribution is permitted solely as part of Monitor.
+
+================================================================================
+3. OPEN-SOURCE LIBRARIES (RUST, ANDROID / JVM, NODE / CLOUDFLARE WORKER)
+================================================================================
+
+* Rust Workspace Dependencies (desktop/Cargo.lock):
+  Dependencies are resolved from crates.io under permissive/weak-copyleft
+  licenses including MIT, Apache-2.0, BSD-2-Clause, BSD-3-Clause, ISC, Zlib,
+  Unicode-3.0, and MPL-2.0. Exact resolved component versions, SHA-256 package
+  hashes, and local cache license metadata can be audited offline using:
+    python scripts/generate_sbom.py --out monitor-sbom.json
+
+* Android Dependencies (android/gradle/libs.versions.toml):
+  Includes Jetpack Compose, AndroidX Core/Security/Biometric/Navigation, Kotlin
+  Coroutines/Serialization, Ktor, OkHttp, and WebRTC libraries licensed under
+  Apache-2.0 and BSD-style terms.
+
+* Cloudflare Worker Broker Tooling & Runtime (cloud/package-lock.json):
+  Includes Wrangler, TypeScript, Biome, ESLint, and Cloudflare Workers runtime
+  types licensed under MIT, Apache-2.0, BSD-2-Clause, and ISC terms.
+
+================================================================================
+4. TRADEMARKS
+================================================================================
+
+The PolyForm Noncommercial License 1.0.0 governing first-party Monitor code, nor any open-source third-party component license, does not grant permission to use the
+trade names, trademarks, service marks, or product logos of Morning Star Web
+except as required for reasonable and customary use in describing source origin
+and reproducing copyright notices.

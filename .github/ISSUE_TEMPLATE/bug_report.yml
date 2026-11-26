@@ -1,0 +1,72 @@
+name: Bug Report
+description: Report an issue, defect, or unexpected behavior in Monitor.
+title: "[Bug]: "
+labels: ["bug", "triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for reporting a bug! Please ensure you have searched existing issues first.
+        For security vulnerabilities, please refer to [SECURITY.md](https://github.com/morningstarweb/Monitor/blob/main/SECURITY.md).
+  - type: dropdown
+    id: component
+    attributes:
+      label: Affected Component
+      description: Which part of Monitor is encountering the issue?
+      options:
+        - Windows Desktop App (System Tray / Agent)
+        - Windows Installer
+        - Android Companion App
+        - Cloudflare Edge Broker
+        - Git Workspace / DAG Graph
+        - Network Pairing / Telemetry Stream
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Monitor Version
+      description: What version of Monitor are you running? (e.g., v1.0.0, commit hash)
+      placeholder: "v1.0.0"
+    validations:
+      required: true
+  - type: input
+    id: os
+    attributes:
+      label: Operating System & Environment
+      description: Details about your environment (e.g., Windows 11 23H2 x64, Android 14 OneUI 6).
+      placeholder: "Windows 11 Pro 23H2 / Android 14"
+    validations:
+      required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: Describe the Bug
+      description: A clear and concise description of what the bug is.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to Reproduce
+      description: Exact steps to reproduce the behavior.
+      placeholder: |
+        1. Launch Monitor desktop application
+        2. Pair Android companion via QR code
+        3. Attempt to stage a file in Git Workspace
+        4. See error
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected Behavior
+      description: What you expected to happen.
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs or Screenshots
+      description: Paste relevant log output or attach screenshots (sanitize any personal data).
+      render: shell

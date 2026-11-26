@@ -1,0 +1,54 @@
+// Example Cloudflare Worker configuration — TEMPLATE ONLY, NO REAL IDENTIFIERS.
+// Copy to cloud/wrangler.jsonc, replace every <PLACEHOLDER>, and keep the real
+// file out of public forks. Never put secrets in this file.
+// Verify all field names and migration behavior against the Wrangler version you
+// actually use; this template mirrors the bindings in the current worktree.
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "<WORKER_NAME>",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-11-01",
+  "compatibility_flags": ["nodejs_compat"],
+
+  // Operator-owned account; do NOT reuse an official account ID in a fork.
+  "account_id": "<ACCOUNT_ID>",
+
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "<D1_DATABASE_NAME>",
+      "database_id": "<D1_DATABASE_ID>",
+      "migrations_dir": "migrations"
+    }
+  ],
+
+  "durable_objects": {
+    "bindings": [
+      { "name": "HOST_ROOM", "class_name": "HostRoom" },
+      { "name": "RATE_LIMITER", "class_name": "RateLimiterDO" },
+      { "name": "QUOTA_RESERVATION", "class_name": "QuotaReservationDO" }
+    ]
+  },
+
+  // Forward-only DO/D1 migrations: v1..v6. Pair any new migration with a restore drill.
+  "migrations": [
+    { "tag": "v1", "new_sqlite_classes": ["HostRoom"] },
+    { "tag": "v2", "new_sqlite_classes": ["RateLimiterDO"] },
+    { "tag": "v3", "new_sqlite_classes": ["QuotaReservationDO"] },
+    { "tag": "v4" },
+    { "tag": "v5" },
+    { "tag": "v6" }
+  ],
+
+  "triggers": {
+    "crons": ["*/5 * * * *", "0 3 * * *"]
+  },
+
+  // Non-secret identifiers only. Secrets (API tokens, client secrets, signing
+  // material) must be set out-of-band, e.g. `wrangler secret put <NAME>`.
+  "vars": {
+    "BILLING_CYCLE_RESET_DAY": "16",
+    "GOOGLE_CLIENT_ID": "<GOOGLE_WEB_CLIENT_ID>",
+    "GOOGLE_DESKTOP_CLIENT_ID": "<GOOGLE_DESKTOP_CLIENT_ID>"
+  }
+}

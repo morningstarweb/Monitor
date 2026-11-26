@@ -1,0 +1,74 @@
+[package]
+name = "monitor-installer"
+version.workspace = true
+edition.workspace = true
+authors.workspace = true
+license.workspace = true
+
+[lints.rust]
+warnings = "deny"
+unused_must_use = "deny"
+missing_debug_implementations = "warn"
+unsafe_code = "allow"
+
+[lints.clippy]
+unwrap_used = "deny"
+expect_used = "deny"
+panic = "deny"
+todo = "deny"
+unimplemented = "deny"
+dbg_macro = "deny"
+print_stdout = "deny"
+print_stderr = "deny"
+clone_on_ref_ptr = "warn"
+explicit_iter_loop = "warn"
+manual_let_else = "warn"
+match_same_arms = "warn"
+redundant_closure_for_method_calls = "warn"
+
+[lib]
+path = "src/lib.rs"
+
+[[bin]]
+name = "monitor-installer"
+path = "src/main.rs"
+
+[[bin]]
+name = "monitor-uninstaller"
+path = "src/uninstaller_bin.rs"
+
+[[bin]]
+name = "pack-payload"
+path = "src/pack_payload_bin.rs"
+
+[dependencies]
+gpui-kit.workspace = true
+anyhow.workspace = true
+tracing.workspace = true
+winreg.workspace = true
+rfd.workspace = true
+sha2.workspace = true
+chrono.workspace = true
+raw-window-handle = "0.6"
+zip = { version = "9", default-features = false, features = ["deflate"] }
+zstd = { version = "0.11", default-features = false }
+
+[target.'cfg(windows)'.dependencies]
+windows = { version = "0.61", features = [
+    "Win32_Foundation",
+    "Win32_Graphics_Gdi",
+    "Win32_Storage_FileSystem",
+    "Win32_System_Com",
+    "Win32_System_Console",
+    "Win32_System_Diagnostics_ToolHelp",
+    "Win32_System_LibraryLoader",
+    "Win32_System_SystemInformation",
+    "Win32_System_Threading",
+    "Win32_UI_Controls",
+    "Win32_UI_Input_KeyboardAndMouse",
+    "Win32_UI_Shell",
+    "Win32_UI_WindowsAndMessaging",
+] }
+
+[build-dependencies]
+sha2.workspace = true

@@ -1,0 +1,37 @@
+# Monitor Brand Configuration: Single Source of Truth
+# Synchronized to desktop Rust & Android Kotlin via scripts/sync_brand.py
+
+[brand]
+name = "Monitor"
+slug = "monitor"
+tagline = "Remote Development & System Monitor"
+version = "1.0.0"
+copyright = "Morning Star Web"
+
+[network]
+default_port = 9480
+tailscale_cgnat_cidr = "100.64.0.0/10"
+loopback_host = "127.0.0.1"
+
+[android]
+application_id = "app.monitor"
+namespace = "app.monitor"
+min_sdk = 30
+target_sdk = 35
+compile_sdk = 35
+version_code = 20100
+version_name = "1.0.0"
+
+[colors.dark]
+primary = "#8B5CF6"
+primary_secondary = "#A855F7"
+accent = "#10B981"
+success = "#22C55E"
+warning = "#F59E0B"
+error = "#EF4444"
+surface = "#0F172A"
+card = "#1E293B"
+border = "#334155"
+text = "#E5E7EB"
+muted_text = "#94A3B8"
+

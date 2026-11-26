@@ -1,0 +1,108 @@
+[workspace]
+resolver = "3"
+members = [
+    "crates/monitor-core",
+    "crates/monitor-storage",
+    "crates/monitor-telemetry",
+    "crates/monitor-git",
+    "crates/monitor-transport",
+    "crates/monitor-agent",
+    "crates/monitor-tray",
+    "crates/monitor-installer",
+]
+
+[workspace.package]
+version = "1.0.0"
+edition = "2024"
+authors = ["Morning Star Web"]
+license = "PolyForm-Noncommercial-1.0.0"
+
+[workspace.lints.rust]
+warnings = "deny"
+unsafe_code = "deny"
+unused_must_use = "deny"
+missing_debug_implementations = "warn"
+
+[workspace.lints.clippy]
+unwrap_used = "deny"
+expect_used = "deny"
+panic = "deny"
+todo = "deny"
+unimplemented = "deny"
+dbg_macro = "deny"
+print_stdout = "deny"
+print_stderr = "deny"
+clone_on_ref_ptr = "warn"
+explicit_iter_loop = "warn"
+manual_let_else = "warn"
+match_same_arms = "warn"
+redundant_closure_for_method_calls = "warn"
+
+[workspace.dependencies]
+# Internal crates
+monitor-core = { path = "crates/monitor-core" }
+monitor-storage = { path = "crates/monitor-storage" }
+monitor-telemetry = { path = "crates/monitor-telemetry" }
+monitor-git = { path = "crates/monitor-git" }
+monitor-transport = { path = "crates/monitor-transport" }
+
+# Async & Networking
+tokio = { version = "1.43", features = ["full"] }
+axum = { version = "0.8", features = ["ws"] }
+tower = "0.5"
+http-body-util = "0.1"
+reqwest = { version = "0.12", features = ["json"] }
+
+# Serialization & Schemas
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+schemars = { version = "0.8", features = ["uuid1", "chrono"] }
+
+# Storage
+rusqlite = { version = "0.41", features = ["bundled", "backup", "uuid"] }
+
+# System & Windows FFI
+windows-sys = { version = "0.61", features = [
+    "Win32_System_Power",
+    "Win32_Foundation",
+    "Win32_Security",
+    "Win32_Security_Cryptography",
+    "Win32_Storage_FileSystem",
+    "Win32_System_JobObjects",
+    "Win32_System_Threading",
+    "Win32_UI_HiDpi",
+    "Win32_UI_WindowsAndMessaging",
+    "Win32_UI_Shell",
+    "Win32_System_Registry",
+] }
+winreg = "0.55"
+sysinfo = "0.33"
+
+# Desktop UI & Tray
+tray-icon = "0.26"
+rfd = "0.18"
+gpui-kit = "0.10.0"
+
+# Logging & Telemetry
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter", "fmt", "json"] }
+
+# Utilities & Error Handling
+thiserror = "2.0"
+anyhow = "1.0"
+bytes = "1"
+uuid = { version = "1.12", features = ["v4", "serde"] }
+chrono = { version = "0.4", features = ["serde"] }
+subtle = "2.6"
+sha2 = "0.11"
+chacha20poly1305 = "0.10"
+rand = "0.9"
+snow = "0.9"
+tempfile = "3.16"
+
+[profile.release]
+strip = "symbols"
+
+[profile.release.package.monitor-installer]
+opt-level = "s"
+
