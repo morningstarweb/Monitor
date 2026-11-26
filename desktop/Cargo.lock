@@ -4484,7 +4484,7 @@ dependencies = [
  "monitor-transport",
  "reqwest",
  "serde_json",
- "sysinfo 0.33.1",
+ "sysinfo 0.40.4",
  "tokio",
  "tracing",
  "windows-sys 0.61.2",
@@ -4552,7 +4552,7 @@ version = "1.0.0"
 dependencies = [
  "chrono",
  "monitor-core",
- "sysinfo 0.33.1",
+ "sysinfo 0.40.4",
  "thiserror 2.0.21",
  "windows-sys 0.61.2",
 ]
@@ -4581,7 +4581,7 @@ dependencies = [
  "sha2 0.11.1",
  "snow",
  "subtle",
- "sysinfo 0.33.1",
+ "sysinfo 0.40.4",
  "tempfile",
  "tokio",
  "tokio-tungstenite",
@@ -4607,7 +4607,7 @@ dependencies = [
  "rfd",
  "serde",
  "serde_json",
- "sysinfo 0.33.1",
+ "sysinfo 0.40.4",
  "tracing",
  "tracing-subscriber",
  "tray-icon",
@@ -5235,6 +5235,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "objc2-io-kit"
+version = "0.3.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "33fafba39597d6dc1fb709123dfa8289d39406734be322956a69f0931c73bb15"
+dependencies = [
+ "libc",
+ "objc2-core-foundation",
+]
+
+[[package]]
 name = "objc2-io-surface"
 version = "0.3.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -5267,6 +5277,17 @@ dependencies = [
  "block2 0.6.2",
  "dispatch2",
  "objc2 0.6.5",
+ "objc2-foundation 0.3.2",
+]
+
+[[package]]
+name = "objc2-open-directory"
+version = "0.3.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "bb82bed227edf5201dfedf072bba4015a33d3d4a98519837295a90f0a23f676d"
+dependencies = [
+ "objc2 0.6.5",
+ "objc2-core-foundation",
  "objc2-foundation 0.3.2",
 ]
 
@@ -7903,16 +7924,17 @@ dependencies = [
 
 [[package]]
 name = "sysinfo"
-version = "0.33.1"
+version = "0.40.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4fc858248ea01b66f19d8e8a6d55f41deaf91e9d495246fd01368d99935c6c01"
+checksum = "3e80749408e2d8bec0ffa303012cf4e1b3b355f4a09087b4fdf7473680f6a2de"
 dependencies = [
- "core-foundation-sys",
  "libc",
  "memchr",
  "ntapi",
- "rayon",
- "windows 0.57.0",
+ "objc2-core-foundation",
+ "objc2-io-kit",
+ "objc2-open-directory",
+ "windows 0.62.2",
 ]
 
 [[package]]

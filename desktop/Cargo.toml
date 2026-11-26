@@ -76,7 +76,7 @@ windows-sys = { version = "0.61", features = [
     "Win32_System_Registry",
 ] }
 winreg = "0.55"
-sysinfo = "0.33"
+sysinfo = "0.40"
 
 # Desktop UI & Tray
 tray-icon = "0.26"
