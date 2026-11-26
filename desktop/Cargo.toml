@@ -59,7 +59,7 @@ serde_json = "1.0"
 schemars = { version = "0.8", features = ["uuid1", "chrono"] }
 
 # Storage
-rusqlite = { version = "0.41", features = ["bundled", "backup", "uuid"] }
+rusqlite = { version = "0.43", features = ["bundled", "backup", "uuid"] }
 
 # System & Windows FFI
 windows-sys = { version = "0.61", features = [
