@@ -73,7 +73,7 @@ where
                                 id: "perm-cloud-row",
                                 icon_data: ICON_CLOUD,
                                 title: "Cloud Relay Sync",
-                                desc: "Allow mobile access through cloud relay",
+                                desc: "Allow access through cloud relay",
                                 is_active: state.cloud_access_allowed,
                                 is_top: true,
                                 is_bottom: false,
@@ -113,7 +113,7 @@ where
                                 id: "perm-git-row",
                                 icon_data: ICON_FOLDER,
                                 title: "Git Actions & Commits",
-                                desc: "Allow staging, commits, branches from phone",
+                                desc: "Allow staging, commits & branches",
                                 is_active: state.git_access_allowed,
                                 is_top: false,
                                 is_bottom: false,
@@ -133,7 +133,7 @@ where
                                 id: "perm-term-row",
                                 icon_data: ICON_TERMINAL,
                                 title: "Remote Terminal",
-                                desc: "Allow T3 Admin phones to execute shell & PTY commands",
+                                desc: "Allow T3 Admin shell commands",
                                 is_active: state.terminal_access_allowed,
                                 is_top: false,
                                 is_bottom: false,
@@ -154,7 +154,7 @@ where
                                 id: "perm-chk-row",
                                 icon_data: ICON_SHIELD,
                                 title: "Automated Safety Rollbacks",
-                                desc: "Allow phone to inspect checkpoints & trigger rollbacks",
+                                desc: "Allow checkpoint & rollback actions",
                                 is_active: state.checkpoint_access_allowed,
                                 is_top: false,
                                 is_bottom: false,
@@ -175,7 +175,7 @@ where
                                 id: "perm-del-row",
                                 icon_data: ICON_TRASH,
                                 title: "File Deletions & Process Kill",
-                                desc: "Allow phone to delete PC files and kill processes (T3)",
+                                desc: "Allow file deletes & process kill (T3)",
                                 is_active: state.delete_access_allowed,
                                 is_top: false,
                                 is_bottom: true,
@@ -223,6 +223,8 @@ where
         .flex_row()
         .items_center()
         .justify_between()
+        .gap(px(8.0))
+        .w_full()
         .px(px(10.0))
         .py(px(8.0))
         .when(is_top, |s| s.rounded_t(px(11.0)))
@@ -237,6 +239,8 @@ where
             div()
                 .flex()
                 .flex_row()
+                .flex_1()
+                .min_w_0()
                 .items_center()
                 .gap(px(9.0))
                 .child(svg_icon(
@@ -252,6 +256,8 @@ where
                     div()
                         .flex()
                         .flex_col()
+                        .flex_1()
+                        .min_w_0()
                         .child(
                             div()
                                 .text_color(theme.text_primary)
@@ -271,6 +277,7 @@ where
         .child(
             div()
                 .flex()
+                .flex_shrink_0()
                 .items_center()
                 .w(px(32.0))
                 .h(px(18.0))

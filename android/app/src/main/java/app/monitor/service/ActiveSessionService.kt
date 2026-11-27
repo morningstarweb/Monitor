@@ -15,7 +15,9 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import app.monitor.MainActivity
-import app.monitor.R
+import app.monitor.notification.AlertNotificationManager
+import app.monitor.notification.MonitorNotifSpec
+import app.monitor.notification.MonitorNotifTone
 
 /**
  * User-initiated foreground service that runs ONLY while at least one desktop
@@ -134,16 +136,27 @@ class ActiveSessionService : Service() {
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
-        return NotificationCompat.Builder(this, CHANNEL_ID)
-            .setSmallIcon(R.mipmap.ic_launcher)
-            .setContentTitle("Session monitor active")
-            .setContentText("$activeCount active desktop session(s) · tap to open Monitor")
+        val builder = NotificationCompat.Builder(this, CHANNEL_ID)
             .setContentIntent(openIntent)
             .setOngoing(true)
             .setCategory(NotificationCompat.CATEGORY_SERVICE)
             .setPriority(NotificationCompat.PRIORITY_LOW)
             .addAction(0, "Disconnect", disconnectPendingIntent)
-            .build()
+
+        return AlertNotificationManager.applyMonitorStyle(
+            context = this,
+            builder = builder,
+            spec = MonitorNotifSpec(
+                title = "Session Monitor",
+                subtitle = "$activeCount active AI coding session(s) streaming",
+                badgeText = "ACTIVE",
+                leftChipLabel = "WATCHDOG",
+                leftChipValue = "$activeCount Running",
+                rightChipLabel = "LINK PRIVACY",
+                rightChipValue = "Noise E2EE",
+                tone = MonitorNotifTone.VIOLET
+            )
+        ).build()
     }
 
     private fun createChannel() {

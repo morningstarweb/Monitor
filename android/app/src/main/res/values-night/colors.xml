@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="notif_text_primary">#F8FAFC</color>
+    <color name="notif_text_secondary">#CBD5E1</color>
+    <color name="notif_text_muted">#94A3B8</color>
+    <color name="notif_chip_bg">#1AFFFFFF</color>
+    <color name="notif_chip_border">#338B5CF6</color>
+    <color name="notif_brand_violet">#A78BFA</color>
+    <color name="notif_brand_emerald">#34D399</color>
+    <color name="notif_brand_amber">#FBBF24</color>
+    <color name="notif_brand_crimson">#F87171</color>
+</resources>

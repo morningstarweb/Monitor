@@ -106,7 +106,7 @@ Monitor ships with a hardware-accelerated **GPUI Native Glass** Windows installe
 
 **User journey:** Download -> Install -> Connect -> Use
 
-1. **Install on Windows:** Download `Monitor_Setup.exe`, check its SHA-256 digest (`cfcc52c4764a6d5e02f1f07cdea6826c7536d5f4f7782c128a22ac043a809757`), and run the installer. No administrator privileges are required.
+1. **Install on Windows:** Download `Monitor_Setup.exe`, check its SHA-256 digest (`9bc892f6700fa6eb35587e64fbce1f2676824ff593fe889fbd029ef2ae6d2155`), and run the installer. No administrator privileges are required.
    ```powershell
    Get-FileHash .\Monitor_Setup.exe -Algorithm SHA256
    ```

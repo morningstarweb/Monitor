@@ -197,25 +197,64 @@ fun MonitorAppContent(
         LaunchedEffect(
             dashboardUiState.isOnline,
             dashboardUiState.systemSnapshot?.hostname,
-            dashboardUiState.activeRoute
+            dashboardUiState.activeRoute,
+            activeSessionCount
         ) {
             val hostname = dashboardUiState.systemSnapshot?.hostname
-            val (title, message) = when {
-                dashboardUiState.isOnline -> {
-                    val route = dashboardUiState.activeRoute.ifBlank { "Monitor Transport" }
-                    "${hostname ?: "Windows PC"} · Connected" to "Live desktop sync active via $route."
-                }
-                hostname != null -> {
-                    "$hostname · Offline" to "Keep Monitor running on your Windows PC to sync over Wi-Fi or Cloud."
-                }
-                else -> {
-                    "Monitor PC · Connecting" to "Linking securely with your Windows laptop companion..."
-                }
+            val friendlyRoute = when {
+                dashboardUiState.activeRoute.contains("LAN", ignoreCase = true) -> "Direct Wi-Fi"
+                dashboardUiState.activeRoute.contains("TURN", ignoreCase = true) -> "WebRTC Relay"
+                dashboardUiState.activeRoute.contains("WebRTC", ignoreCase = true) -> "WebRTC P2P"
+                dashboardUiState.activeRoute.contains("Cloud", ignoreCase = true) -> "Cloud Relay"
+                else -> dashboardUiState.activeRoute.ifBlank { "Encrypted Link" }
+            }
+            val rightValue = if (activeSessionCount > 0) {
+                "$activeSessionCount Agent(s) Active"
+            } else {
+                "Noise E2EE"
+            }
+            val spec = when {
+                dashboardUiState.isOnline -> app.monitor.notification.MonitorNotifSpec(
+                    title = hostname ?: "Windows PC",
+                    subtitle = "Live telemetry & repo sync active",
+                    badgeText = "LIVE",
+                    leftChipLabel = "ROUTE",
+                    leftChipValue = friendlyRoute,
+                    rightChipLabel = if (activeSessionCount > 0) "AGENTS" else "SECURITY",
+                    rightChipValue = rightValue,
+                    tone = app.monitor.notification.MonitorNotifTone.LIVE
+                )
+                hostname != null -> app.monitor.notification.MonitorNotifSpec(
+                    title = hostname,
+                    subtitle = "Host offline · open Monitor on your PC",
+                    badgeText = "OFFLINE",
+                    leftChipLabel = "ROUTE",
+                    leftChipValue = "Standby",
+                    rightChipLabel = "STATUS",
+                    rightChipValue = "Waiting",
+                    tone = app.monitor.notification.MonitorNotifTone.WARNING
+                )
+                else -> app.monitor.notification.MonitorNotifSpec(
+                    title = "Monitor Workstation",
+                    subtitle = "Linking securely with your PC...",
+                    badgeText = "SYNCING",
+                    leftChipLabel = "ROUTE",
+                    leftChipValue = "Connecting",
+                    rightChipLabel = "STATUS",
+                    rightChipValue = "Handshaking",
+                    tone = app.monitor.notification.MonitorNotifTone.VIOLET
+                )
             }
             app.monitor.notification.AlertNotificationManager.showCompanionStatusNotification(
                 context = appContext,
-                title = title,
-                message = message
+                title = spec.title,
+                message = spec.subtitle,
+                badgeText = spec.badgeText,
+                leftChipLabel = spec.leftChipLabel,
+                leftChipValue = spec.leftChipValue,
+                rightChipLabel = spec.rightChipLabel,
+                rightChipValue = spec.rightChipValue,
+                tone = spec.tone
             )
         }
 
