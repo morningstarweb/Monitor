@@ -107,4 +107,76 @@ mod tests {
                 .any(|(k, v)| *k == "client_secret" && *v == "GOCSPX-configured_in_env")
         );
     }
+
+    #[tokio::test]
+    #[allow(clippy::unwrap_used, clippy::expect_used)]
+    async fn test_register_rotates_device_id_on_409_conflict() {
+        use axum::{Json, Router, http::StatusCode, routing::post};
+        use std::sync::{Arc, Mutex as StdMutex};
+
+        let dir = tempfile::tempdir().unwrap();
+        let storage = Storage::open(dir.path().join("test.db")).unwrap();
+        let old_id = "win_stale_previous_user_id";
+        storage.set_setting("machine_device_id", old_id).unwrap();
+
+        let seen_ids = Arc::new(StdMutex::new(Vec::<String>::new()));
+        let seen_clone = Arc::clone(&seen_ids);
+
+        let app = Router::new().route(
+            "/api/v1/auth/google-verify",
+            post(move |Json(payload): Json<serde_json::Value>| {
+                let seen = Arc::clone(&seen_clone);
+                async move {
+                    let dev_id = payload["device_id"]
+                        .as_str()
+                        .unwrap_or_default()
+                        .to_string();
+                    seen.lock().unwrap().push(dev_id.clone());
+                    if dev_id == old_id {
+                        (
+                            StatusCode::CONFLICT,
+                            Json(serde_json::json!({
+                                "error": "Device ID is already registered to another account"
+                            })),
+                        )
+                    } else {
+                        (
+                            StatusCode::OK,
+                            Json(serde_json::json!({
+                                "success": true,
+                                "token": "session_tok_123",
+                                "user": { "email": "newuser@example.com", "name": "New User" }
+                            })),
+                        )
+                    }
+                }
+            }),
+        );
+
+        let listener = TcpListener::bind("127.0.0.1:0").await.unwrap();
+        let addr = listener.local_addr().unwrap();
+        tokio::spawn(async move {
+            let _ = axum::serve(listener, app).await;
+        });
+
+        let client = reqwest::Client::new();
+        let slot = StdMutex::new(None);
+        let base_url = format!("http://{addr}");
+        let (account, _) =
+            register_with_cloud_broker_at(&storage, &slot, 9480, &base_url, &client, "tok", None)
+                .await
+                .expect("409 conflict should rotate device_id and succeed on retry");
+
+        assert_eq!(account.email, "newuser@example.com");
+        assert_ne!(account.device_id, old_id);
+        assert!(account.device_id.starts_with("win_"));
+        assert_eq!(
+            storage.get_setting("machine_device_id").unwrap().as_deref(),
+            Some(account.device_id.as_str())
+        );
+        let attempts = seen_ids.lock().unwrap().clone();
+        assert_eq!(attempts.len(), 2);
+        assert_eq!(attempts[0], old_id);
+        assert_eq!(attempts[1], account.device_id);
+    }
 }

@@ -29,35 +29,54 @@ private data class DetectedDesktop(
 object CloudAuthService {
     private const val BROKER_URL = "https://your-monitor-broker.workers.dev"
 
+    private fun postGoogleVerify(
+        brokerUrl: String,
+        idToken: String,
+        deviceId: String,
+        deviceName: String,
+        noisePublicKey: String
+    ): Pair<Int, String> {
+        val url = URL("$brokerUrl/api/v1/auth/google-verify")
+        val conn = url.openConnection() as HttpURLConnection
+        conn.requestMethod = "POST"
+        conn.setRequestProperty("Content-Type", "application/json")
+        conn.connectTimeout = 15000
+        conn.readTimeout = 15000
+        conn.doOutput = true
+
+        val jsonBody = JSONObject().apply {
+            put("id_token", idToken)
+            put("device_id", deviceId)
+            put("device_name", deviceName)
+            put("platform", "android")
+            put("role", "client")
+            put("noise_public_key", noisePublicKey)
+        }
+
+        conn.outputStream.use { os ->
+            os.write(jsonBody.toString().toByteArray(Charsets.UTF_8))
+        }
+
+        val code = conn.responseCode
+        val stream = if (code in 200..299) conn.inputStream else conn.errorStream
+        val bodyStr = stream?.bufferedReader()?.use { it.readText() }.orEmpty()
+        return code to bodyStr
+    }
+
     suspend fun verifyGoogleToken(idToken: String, deviceName: String, tokenStorage: TokenStorage): Result<CloudAuthResult> = withContext(Dispatchers.IO) {
         try {
-            val url = URL("$BROKER_URL/api/v1/auth/google-verify")
-            val conn = url.openConnection() as HttpURLConnection
-            conn.requestMethod = "POST"
-            conn.setRequestProperty("Content-Type", "application/json")
-            conn.connectTimeout = 15000
-            conn.readTimeout = 15000
-            conn.doOutput = true
-
-            val deviceId = tokenStorage.getOrCreateCloudDeviceId()
             val noisePublicKey = tokenStorage.getOrCreateNoiseStaticKeyPair().publicKey
                 .joinToString("") { "%02x".format(it) }
-            val jsonBody = JSONObject().apply {
-                put("id_token", idToken)
-                put("device_id", deviceId)
-                put("device_name", deviceName)
-                put("platform", "android")
-                put("role", "client")
-                put("noise_public_key", noisePublicKey)
-            }
+            val initialDeviceId = tokenStorage.getOrCreateCloudDeviceId()
+            var (code, bodyStr) = postGoogleVerify(BROKER_URL, idToken, initialDeviceId, deviceName, noisePublicKey)
 
-            conn.outputStream.use { os ->
-                os.write(jsonBody.toString().toByteArray(Charsets.UTF_8))
+            // Rotate device ID once on 409 conflict so switching accounts never gets stuck.
+            if (code == HttpURLConnection.HTTP_CONFLICT) {
+                val freshDeviceId = tokenStorage.rotateCloudDeviceId()
+                val retry = postGoogleVerify(BROKER_URL, idToken, freshDeviceId, deviceName, noisePublicKey)
+                code = retry.first
+                bodyStr = retry.second
             }
-
-            val code = conn.responseCode
-            val stream = if (code in 200..299) conn.inputStream else conn.errorStream
-            val bodyStr = stream?.bufferedReader()?.use { it.readText() }.orEmpty()
 
             if (code in 200..299) {
                 val respJson = JSONObject(bodyStr)

@@ -56,6 +56,12 @@ class TokenStorage(context: Context) {
     @Synchronized
     fun getOrCreateCloudDeviceId(): String {
         store.getString(KEY_CLOUD_DEVICE_ID)?.let { return it }
+        return rotateCloudDeviceId()
+    }
+
+    /** Generates and persists a fresh Android device ID when switching accounts after a 409 conflict. */
+    @Synchronized
+    fun rotateCloudDeviceId(): String {
         val id = "android-${java.util.UUID.randomUUID()}"
         store.putString(KEY_CLOUD_DEVICE_ID, id)
         return id

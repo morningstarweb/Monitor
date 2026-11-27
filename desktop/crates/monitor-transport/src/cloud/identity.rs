@@ -36,6 +36,11 @@ pub fn get_or_create_device_id(storage: &Storage) -> String {
         return existing;
     }
 
+    rotate_device_id(storage)
+}
+
+/// Replaces the persisted workstation identifier when switching accounts after a 409 conflict.
+pub fn rotate_device_id(storage: &Storage) -> String {
     let new_id = format!("win_{}", uuid::Uuid::new_v4().simple());
     let _ = storage.set_setting("machine_device_id", &new_id);
     new_id
