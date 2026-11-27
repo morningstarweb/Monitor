@@ -185,6 +185,7 @@ pub(crate) fn complete_device_verification(
 
     let promote_identity = |identity: &str| {
         state.unrevoke_device(identity);
+        crate::local_handlers::clear_device_dismissed(&state.storage, identity);
         let _ = state
             .storage
             .enroll_viewer_with_tier(identity, final_display_name, identity, "T3");

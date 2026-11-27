@@ -8,11 +8,12 @@ use crate::handlers::{
     request_pairing_code, websocket_stream,
 };
 use crate::local_handlers::{
-    approve_device, clear_alerts_handler, disconnect_cloud_handler, generate_device_otp_handler,
-    get_local_status, get_permissions_handler, register_project, remove_project, revoke_device,
-    set_device_tier_handler, start_cloud_login_handler, toggle_checkpoints_access_handler,
-    toggle_cloud_access_handler, toggle_delete_access_handler, toggle_git_access_handler,
-    toggle_local_access_handler, toggle_terminal_access_handler,
+    approve_device, clear_alerts_handler, clear_stale_devices_handler, disconnect_cloud_handler,
+    dismiss_device_handler, generate_device_otp_handler, get_local_status, get_permissions_handler,
+    register_project, remove_project, revoke_device, set_device_tier_handler,
+    start_cloud_login_handler, toggle_checkpoints_access_handler, toggle_cloud_access_handler,
+    toggle_delete_access_handler, toggle_git_access_handler, toggle_local_access_handler,
+    toggle_terminal_access_handler,
 };
 use crate::state::AppState;
 use crate::watchdog_handlers::{
@@ -130,6 +131,14 @@ pub fn build_local_router(state: AppState) -> Router {
         .route("/local/projects", post(register_project))
         .route("/local/projects/{repo_id}", delete(remove_project))
         .route("/local/devices/{device_id}", delete(revoke_device))
+        .route(
+            "/local/devices/{device_id}/dismiss",
+            post(dismiss_device_handler),
+        )
+        .route(
+            "/local/devices/clear-stale",
+            post(clear_stale_devices_handler),
+        )
         .route(
             "/local/devices/{device_id}/otp",
             post(generate_device_otp_handler),

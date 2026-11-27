@@ -91,6 +91,8 @@ pub enum Command {
     RegisterPath(std::path::PathBuf),
     RemoveProject(String),
     RevokeDevice(String),
+    DismissDevice(String),
+    ClearStaleDevices(String),
     GenerateDeviceOtp(String, String),
     SetDeviceTier(String, String),
     CloudLogin,
@@ -131,6 +133,16 @@ fn action(client: &Client, base: &str, command: Command) -> Result<Option<String
         Command::RevokeDevice(id) => (
             client.delete(format!("{base}/local/devices/{id}")),
             "Device disconnected",
+        ),
+        Command::DismissDevice(id) => (
+            client.post(format!("{base}/local/devices/{id}/dismiss")),
+            "Device removed",
+        ),
+        Command::ClearStaleDevices(scope) => (
+            client
+                .post(format!("{base}/local/devices/clear-stale"))
+                .json(&serde_json::json!({ "scope": scope })),
+            "Cleared stale devices",
         ),
         Command::GenerateDeviceOtp(id, name) => (
             client

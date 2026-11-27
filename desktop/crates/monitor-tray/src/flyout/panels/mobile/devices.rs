@@ -1,7 +1,7 @@
 use super::{MobilePalette, paired_row};
 use crate::client::{Command, Device};
 use crate::flyout::MonitorFlyout;
-use crate::flyout::icons::{ICON_QR, ICON_SMARTPHONE, svg_icon};
+use crate::flyout::icons::{ICON_QR, ICON_SMARTPHONE, ICON_TRASH, svg_icon};
 use crate::flyout::state::FlyoutState;
 use crate::flyout::theme::FlyoutTheme;
 use gpui_kit::*;
@@ -77,6 +77,86 @@ pub(super) fn render_devices_list_view(
     container
 }
 
+fn render_clear_section_button(
+    id: &'static str,
+    scope: &'static str,
+    command_sender: &Option<Sender<Command>>,
+    cx: &mut Context<MonitorFlyout>,
+) -> impl IntoElement {
+    let tx_clear = command_sender.clone();
+    div()
+        .id(id)
+        .flex()
+        .flex_row()
+        .items_center()
+        .gap(px(3.0))
+        .px(px(6.5))
+        .py(px(2.0))
+        .rounded_full()
+        .bg(rgba(0xef444415))
+        .border_1()
+        .border_color(rgba(0xef444435))
+        .cursor_pointer()
+        .hover(|s| s.bg(rgba(0xef444428)))
+        .on_click(cx.listener(move |this, _, _, cx| {
+            if let Some(ref tx) = tx_clear {
+                let _ = tx.send(Command::ClearStaleDevices(scope.to_string()));
+            }
+            if scope == "unverified" {
+                this.state
+                    .devices
+                    .retain(|d| !(d.is_pending && !d.is_revoked));
+            } else if scope == "revoked" {
+                this.state.devices.retain(|d| !d.is_revoked);
+            }
+            cx.notify();
+        }))
+        .child(svg_icon(ICON_TRASH, 8.5, rgba(0xef4444ff)))
+        .child(
+            div()
+                .text_color(rgba(0xef4444ff))
+                .text_size(px(8.5))
+                .font_weight(FontWeight::SEMIBOLD)
+                .child("Clear"),
+        )
+}
+
+fn render_dismiss_device_button(
+    id_prefix: &'static str,
+    idx: usize,
+    dev_id: String,
+    theme: &FlyoutTheme,
+    command_sender: &Option<Sender<Command>>,
+    cx: &mut Context<MonitorFlyout>,
+) -> impl IntoElement {
+    let tx_dismiss = command_sender.clone();
+    div()
+        .id(ElementId::named_usize(id_prefix, idx))
+        .flex()
+        .items_center()
+        .justify_center()
+        .px(px(5.0))
+        .py(px(3.0))
+        .rounded_full()
+        .bg(theme.quit_bg)
+        .border_1()
+        .border_color(theme.quit_border)
+        .cursor_pointer()
+        .hover(|s| s.bg(theme.quit_hover))
+        .on_click(cx.listener(move |this, _, _, cx| {
+            cx.stop_propagation();
+            if let Some(ref tx) = tx_dismiss {
+                let _ = tx.send(Command::DismissDevice(dev_id.clone()));
+            }
+            this.state.devices.retain(|d| d.device_id != dev_id);
+            if this.selected_otp_device_id.as_deref() == Some(dev_id.as_str()) {
+                this.selected_otp_device_id = None;
+            }
+            cx.notify();
+        }))
+        .child(svg_icon(ICON_TRASH, 8.5, theme.quit_text))
+}
+
 fn render_awaiting_section(
     awaiting_devices: Vec<(usize, &Device)>,
     theme: &FlyoutTheme,
@@ -94,17 +174,31 @@ fn render_awaiting_section(
         .w_full()
         .child(
             div()
-                .text_color(rgba(0x38bdf8ff))
-                .text_size(px(10.0))
-                .font_weight(FontWeight::BOLD)
+                .flex()
+                .flex_row()
+                .items_center()
+                .justify_between()
                 .px(px(2.0))
-                .child(format!(
-                    "REGISTERED · VERIFY OTP ({})",
-                    awaiting_devices.len()
+                .child(
+                    div()
+                        .text_color(rgba(0x38bdf8ff))
+                        .text_size(px(10.0))
+                        .font_weight(FontWeight::BOLD)
+                        .child(format!(
+                            "REGISTERED · VERIFY OTP ({})",
+                            awaiting_devices.len()
+                        )),
+                )
+                .child(render_clear_section_button(
+                    "btn-clear-unverified",
+                    "unverified",
+                    command_sender,
+                    cx,
                 )),
         )
         .children(awaiting_devices.into_iter().map(|(idx, dev)| {
             let dev_id = dev.device_id.clone();
+            let dev_id_dismiss = dev.device_id.clone();
             let dev_name = dev.display_name.clone();
             let has_live_otp = dev.active_otp.is_some();
             let tx_otp = command_sender.clone();
@@ -176,25 +270,40 @@ fn render_awaiting_section(
                         .flex()
                         .flex_row()
                         .items_center()
-                        .gap(px(3.0))
-                        .px(px(8.0))
-                        .py(px(3.0))
-                        .rounded_full()
-                        .bg(copy_bg)
-                        .border_1()
-                        .border_color(copy_border)
-                        .child(svg_icon(ICON_QR, 8.5, theme.accent_blue))
+                        .gap(px(4.0))
                         .child(
                             div()
-                                .text_color(theme.accent_blue)
-                                .text_size(px(9.0))
-                                .font_weight(FontWeight::SEMIBOLD)
-                                .child(if has_live_otp {
-                                    "View OTP ›"
-                                } else {
-                                    "OTP ›"
-                                }),
-                        ),
+                                .flex()
+                                .flex_row()
+                                .items_center()
+                                .gap(px(3.0))
+                                .px(px(8.0))
+                                .py(px(3.0))
+                                .rounded_full()
+                                .bg(copy_bg)
+                                .border_1()
+                                .border_color(copy_border)
+                                .child(svg_icon(ICON_QR, 8.5, theme.accent_blue))
+                                .child(
+                                    div()
+                                        .text_color(theme.accent_blue)
+                                        .text_size(px(9.0))
+                                        .font_weight(FontWeight::SEMIBOLD)
+                                        .child(if has_live_otp {
+                                            "View OTP ›"
+                                        } else {
+                                            "OTP ›"
+                                        }),
+                                ),
+                        )
+                        .child(render_dismiss_device_button(
+                            "btn-dismiss-unverified",
+                            idx,
+                            dev_id_dismiss,
+                            theme,
+                            command_sender,
+                            cx,
+                        )),
                 )
         }))
 }
@@ -216,13 +325,27 @@ fn render_previous_section(
         .w_full()
         .child(
             div()
-                .text_color(theme.text_secondary)
-                .text_size(px(10.0))
+                .flex()
+                .flex_row()
+                .items_center()
+                .justify_between()
                 .px(px(2.0))
-                .child(format!("PREVIOUS DEVICES ({})", previous_devices.len())),
+                .child(
+                    div()
+                        .text_color(theme.text_secondary)
+                        .text_size(px(10.0))
+                        .child(format!("PREVIOUS DEVICES ({})", previous_devices.len())),
+                )
+                .child(render_clear_section_button(
+                    "btn-clear-revoked",
+                    "revoked",
+                    command_sender,
+                    cx,
+                )),
         )
         .children(previous_devices.into_iter().map(|(idx, dev)| {
             let dev_id = dev.device_id.clone();
+            let dev_id_dismiss = dev.device_id.clone();
             let dev_name = dev.display_name.clone();
             let tx_otp = command_sender.clone();
             div()
@@ -264,38 +387,53 @@ fn render_previous_section(
                 )
                 .child(
                     div()
-                        .id(ElementId::named_usize("btn-reverify-prev", idx))
                         .flex()
                         .flex_row()
                         .items_center()
-                        .gap(px(3.0))
-                        .px(px(7.0))
-                        .py(px(2.5))
-                        .rounded_full()
-                        .bg(copy_bg)
-                        .border_1()
-                        .border_color(copy_border)
-                        .cursor_pointer()
-                        .hover(move |s| s.bg(copy_border))
-                        .on_click(cx.listener(move |this, _, _, cx| {
-                            if let Some(ref tx) = tx_otp {
-                                let _ = tx.send(Command::GenerateDeviceOtp(
-                                    dev_id.clone(),
-                                    dev_name.clone(),
-                                ));
-                            }
-                            this.show_qr_code = false;
-                            this.selected_otp_device_id = Some(dev_id.clone());
-                            cx.notify();
-                        }))
-                        .child(svg_icon(ICON_QR, 8.5, theme.accent_blue))
+                        .gap(px(4.0))
                         .child(
                             div()
-                                .text_color(theme.accent_blue)
-                                .text_size(px(8.5))
-                                .font_weight(FontWeight::MEDIUM)
-                                .child("OTP ›"),
-                        ),
+                                .id(ElementId::named_usize("btn-reverify-prev", idx))
+                                .flex()
+                                .flex_row()
+                                .items_center()
+                                .gap(px(3.0))
+                                .px(px(7.0))
+                                .py(px(2.5))
+                                .rounded_full()
+                                .bg(copy_bg)
+                                .border_1()
+                                .border_color(copy_border)
+                                .cursor_pointer()
+                                .hover(move |s| s.bg(copy_border))
+                                .on_click(cx.listener(move |this, _, _, cx| {
+                                    if let Some(ref tx) = tx_otp {
+                                        let _ = tx.send(Command::GenerateDeviceOtp(
+                                            dev_id.clone(),
+                                            dev_name.clone(),
+                                        ));
+                                    }
+                                    this.show_qr_code = false;
+                                    this.selected_otp_device_id = Some(dev_id.clone());
+                                    cx.notify();
+                                }))
+                                .child(svg_icon(ICON_QR, 8.5, theme.accent_blue))
+                                .child(
+                                    div()
+                                        .text_color(theme.accent_blue)
+                                        .text_size(px(8.5))
+                                        .font_weight(FontWeight::MEDIUM)
+                                        .child("OTP ›"),
+                                ),
+                        )
+                        .child(render_dismiss_device_button(
+                            "btn-dismiss-revoked",
+                            idx,
+                            dev_id_dismiss,
+                            theme,
+                            command_sender,
+                            cx,
+                        )),
                 )
         }))
 }

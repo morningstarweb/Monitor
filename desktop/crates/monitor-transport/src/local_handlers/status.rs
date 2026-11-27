@@ -206,7 +206,7 @@ pub async fn get_local_status(
         .1
         .clone();
     for cd in cached_cloud_devices {
-        if cd.role == "desktop" {
+        if cd.role == "desktop" || is_device_dismissed(&state.storage, &cd.id) {
             continue;
         }
         let linked_pk = state
@@ -214,6 +214,12 @@ pub async fn get_local_status(
             .get_setting(&format!("cloud_device_link:{}", cd.id))
             .ok()
             .flatten();
+        if linked_pk
+            .as_deref()
+            .is_some_and(|pk| is_device_dismissed(&state.storage, pk))
+        {
+            continue;
+        }
         let matched = devices.iter_mut().find(|d| {
             d.device_id.as_str() == cd.id
                 || linked_pk.as_deref() == Some(d.device_id.as_str())
@@ -295,6 +301,13 @@ pub async fn get_local_status(
             d.is_pending = false;
         }
     }
+    devices.retain(|d| {
+        if d.is_pending || d.is_revoked {
+            !is_device_dismissed(&state.storage, d.device_id.as_str())
+        } else {
+            true
+        }
+    });
     let pairing_code = state
         .pairing_code
         .lock()

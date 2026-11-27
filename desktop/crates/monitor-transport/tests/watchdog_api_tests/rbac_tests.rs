@@ -223,3 +223,175 @@ async fn rbac_enforced_across_git_identity_alerts_sessions_and_merge_pr() {
         );
     }
 }
+
+#[tokio::test]
+async fn dismiss_and_clear_stale_devices_hide_clutter_while_preserving_active_and_revoked_tokens() {
+    use http_body_util::BodyExt;
+    use monitor_transport::state::CloudDeviceInfo;
+
+    let (state, _op) = create_test_state_and_token().await;
+    let active_id = DeviceId::new("dev_active_phone");
+    state
+        .storage
+        .insert_device(
+            &active_id,
+            "Active Phone",
+            &monitor_transport::auth::TokenAuthenticator::hash_token(
+                "tok_active_keep_secret_123456",
+            ),
+            DeviceRole::Admin,
+        )
+        .unwrap();
+
+    let revoked_id = DeviceId::new("dev_old_revoked_phone");
+    let revoked_token_hash =
+        monitor_transport::auth::TokenAuthenticator::hash_token("tok_revoked_stay_dead_123456");
+    state
+        .storage
+        .insert_device(
+            &revoked_id,
+            "Old Revoked",
+            &revoked_token_hash,
+            DeviceRole::Operator,
+        )
+        .unwrap();
+    state.storage.revoke_device(&revoked_id).unwrap();
+
+    {
+        let mut cache = state.cloud_devices_cache.lock().unwrap();
+        *cache = (
+            Some(std::time::Instant::now()),
+            vec![
+                CloudDeviceInfo {
+                    id: "android-dup-1".to_string(),
+                    name: "OnePlus CPH2401".to_string(),
+                    platform: "android".to_string(),
+                    role: "client".to_string(),
+                    is_online: 0,
+                    last_heartbeat: 100,
+                },
+                CloudDeviceInfo {
+                    id: "android-dup-2".to_string(),
+                    name: "OnePlus CPH2401".to_string(),
+                    platform: "android".to_string(),
+                    role: "client".to_string(),
+                    is_online: 0,
+                    last_heartbeat: 99,
+                },
+                CloudDeviceInfo {
+                    id: "android-dup-3".to_string(),
+                    name: "V2511".to_string(),
+                    platform: "android".to_string(),
+                    role: "client".to_string(),
+                    is_online: 0,
+                    last_heartbeat: 98,
+                },
+            ],
+        );
+    }
+
+    let app = monitor_transport::build_local_router(state.clone());
+
+    // 1. Dismiss single cloud-only unverified device
+    let dismiss_res = app
+        .clone()
+        .oneshot(
+            Request::builder()
+                .method("POST")
+                .uri("/api/v1/local/devices/android-dup-1/dismiss")
+                .extension(ConnectInfo(
+                    "127.0.0.1:43000".parse::<SocketAddr>().unwrap(),
+                ))
+                .body(Body::empty())
+                .unwrap(),
+        )
+        .await
+        .unwrap();
+    assert_eq!(dismiss_res.status(), StatusCode::NO_CONTENT);
+
+    // 2. Bulk-clear remaining unverified devices
+    let clear_unverified = app
+        .clone()
+        .oneshot(
+            Request::builder()
+                .method("POST")
+                .uri("/api/v1/local/devices/clear-stale")
+                .header("Content-Type", "application/json")
+                .extension(ConnectInfo(
+                    "127.0.0.1:43000".parse::<SocketAddr>().unwrap(),
+                ))
+                .body(Body::from(r#"{"scope":"unverified"}"#))
+                .unwrap(),
+        )
+        .await
+        .unwrap();
+    assert_eq!(clear_unverified.status(), StatusCode::OK);
+
+    // 3. Bulk-clear revoked devices
+    let clear_revoked = app
+        .clone()
+        .oneshot(
+            Request::builder()
+                .method("POST")
+                .uri("/api/v1/local/devices/clear-stale")
+                .header("Content-Type", "application/json")
+                .extension(ConnectInfo(
+                    "127.0.0.1:43000".parse::<SocketAddr>().unwrap(),
+                ))
+                .body(Body::from(r#"{"scope":"revoked"}"#))
+                .unwrap(),
+        )
+        .await
+        .unwrap();
+    assert_eq!(clear_revoked.status(), StatusCode::OK);
+
+    // 4. Verify status only shows Active Phone (all 3 cloud dups & revoked device are hidden)
+    let status_res = app
+        .clone()
+        .oneshot(
+            Request::builder()
+                .method("GET")
+                .uri("/api/v1/local/status")
+                .extension(ConnectInfo(
+                    "127.0.0.1:43000".parse::<SocketAddr>().unwrap(),
+                ))
+                .body(Body::empty())
+                .unwrap(),
+        )
+        .await
+        .unwrap();
+    assert_eq!(status_res.status(), StatusCode::OK);
+    let body_bytes = status_res.into_body().collect().await.unwrap().to_bytes();
+    let status_json: serde_json::Value = serde_json::from_slice(&body_bytes).unwrap();
+    let listed_ids: Vec<&str> = status_json["devices"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .filter_map(|d| d["device_id"].as_str())
+        .collect();
+    assert!(listed_ids.contains(&"dev_active_phone"));
+    assert!(!listed_ids.contains(&"android-dup-1"));
+    assert!(!listed_ids.contains(&"android-dup-2"));
+    assert!(!listed_ids.contains(&"android-dup-3"));
+    assert!(!listed_ids.contains(&"dev_old_revoked_phone"));
+
+    // AUD-01 invariant: revoked device credential remains permanently revoked in SQLite.
+    assert!(!state.storage.is_device_active(&revoked_id).unwrap());
+
+    // Invalid scope rejected cleanly
+    let bad_scope = app
+        .oneshot(
+            Request::builder()
+                .method("POST")
+                .uri("/api/v1/local/devices/clear-stale")
+                .header("Content-Type", "application/json")
+                .extension(ConnectInfo(
+                    "127.0.0.1:43000".parse::<SocketAddr>().unwrap(),
+                ))
+                .body(Body::from(r#"{"scope":"invalid"}"#))
+                .unwrap(),
+        )
+        .await
+        .unwrap();
+    assert_eq!(bad_scope.status(), StatusCode::BAD_REQUEST);
+}
